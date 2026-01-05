@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blvck Energy Station — StationOS Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont; }
+</style>
+</head>
+
+<body class="bg-slate-950">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+/* ===== DEMO DATA ===== */
+const fuelData = [
+  { id: 1, name: "Petrol", price: 12.5, stock: 5200 },
+  { id: 2, name: "Diesel", price: 13.2, stock: 4800 },
+  { id: 3, name: "Super", price: 14.1, stock: 3000 }
+];
+
+function App(){
+  const [view,setView]=useState("login");
+  const [pin,setPin]=useState("");
+  const [role,setRole]=useState(null);
+
+  const [products,setProducts]=useState(fuelData);
+  const [selected,setSelected]=useState(null);
+  const [qty,setQty]=useState(1);
+  const [isCredit,setIsCredit]=useState(false);
+
+  const [cash,setCash]=useState(0);
+  const [credit,setCredit]=useState(0);
+
+  const login=()=>{
+    if(pin==="0000"){ setRole("manager"); setView("monitor"); }
+    else if(pin==="1234"){ setRole("staff"); setView("terminal"); }
+    else alert("Demo PINs: 0000 (Manager), 1234 (Staff)");
+    setPin("");
+  };
+
+  const sell=()=>{
+    const total = qty * selected.price;
+    if(isCredit) setCredit(c=>c+total);
+    else setCash(c=>c+total);
+
+    setProducts(p=>p.map(x =>
+      x.id===selected.id ? {...x, stock:x.stock-qty} : x
+    ));
+
+    setSelected(null);
+    setQty(1);
+    setIsCredit(false);
+  };
+
+  if(view==="login"){
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl w-80 text-center">
+          <h1 className="text-2xl font-black mb-2">Blvck Energy Station</h1>
+          <p className="text-xs mb-6 text-slate-500">StationOS Demo</p>
+          <input value={pin} onChange={e=>setPin(e.target.value)}
+            type="password"
+            className="w-full p-3 bg-slate-100 rounded mb-4 text-center"/>
+          <button onClick={login}
+            className="w-full bg-indigo-600 text-white p-3 rounded-xl font-black">
+            LOGIN
+          </button>
+          <p className="text-xs mt-4 text-slate-400">
+            0000 Manager · 1234 Staff
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-slate-100">
+
+      <aside className="w-56 bg-white p-6 hidden md:flex flex-col justify-between">
+        <div>
+          <h2 className="font-black text-lg mb-6">StationOS</h2>
+          <Nav label="Terminal" onClick={()=>setView("terminal")}/>
+          {role==="manager" && <Nav label="Monitor" onClick={()=>setView("monitor")}/>}
+        </div>
+        <button onClick={()=>setView("login")} className="text-rose-500 font-bold">
+          Exit
+        </button>
+      </aside>
+
+      <main className="flex-1 p-6 overflow-y-auto">
+
+        {view==="terminal" && (
+          <>
+            <h2 className="font-black text-xl mb-4">POS Terminal</h2>
+
+            <div className="grid grid-cols-2 gap-4">
+              {products.map(p=>(
+                <button key={p.id}
+                  onClick={()=>setSelected(p)}
+                  className="bg-white p-4 rounded-xl shadow">
+                  <p className="font-black">{p.name}</p>
+                  <p>GHS {p.price.toFixed(2)}</p>
+                  <p className="text-xs">Stock: {p.stock} L</p>
+                </button>
+              ))}
+            </div>
+
+            {selected && (
+              <div className="bg-white p-6 mt-6 rounded-xl">
+                <h3 className="font-black mb-2">{selected.name}</h3>
+
+                <input type="number" value={qty}
+                  onChange={e=>setQty(+e.target.value)}
+                  className="w-full p-3 bg-slate-100 rounded mb-3"/>
+
+                <div className="flex gap-2 mb-4">
+                  <button onClick={()=>setIsCredit(false)}
+                    className={`flex-1 p-3 rounded ${!isCredit?"bg-emerald-500 text-white":"bg-slate-200"}`}>
+                    Cash
+                  </button>
+                  <button onClick={()=>setIsCredit(true)}
+                    className={`flex-1 p-3 rounded ${isCredit?"bg-orange-500 text-white":"bg-slate-200"}`}>
+                    Credit
+                  </button>
+                </div>
+
+                <button onClick={sell}
+                  className="w-full bg-indigo-600 text-white p-4 rounded-xl font-black">
+                  CONFIRM SALE
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {view==="monitor" && role==="manager" && (
+          <>
+            <h2 className="font-black text-xl mb-6">Remote Monitor</h2>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Stat label="Cash Sales" value={`GHS ${cash.toFixed(2)}`} />
+              <Stat label="Credit Sales" value={`GHS ${credit.toFixed(2)}`} />
+            </div>
+
+            <h3 className="font-black mb-3">Inventory</h3>
+            {products.map(p=>(
+              <div key={p.id} className="bg-white p-4 rounded mb-2 flex justify-between">
+                <span className="font-bold">{p.name}</span>
+                <span>{p.stock} L</span>
+              </div>
+            ))}
+          </>
+        )}
+
+      </main>
+    </div>
+  );
+}
+
+const Nav=({label,onClick})=>(
+  <button onClick={onClick}
+    className="block w-full text-left p-3 rounded hover:bg-slate-100 font-bold">
+    {label}
+  </button>
+);
+
+const Stat=({label,value})=>(
+  <div className="bg-white p-4 rounded-xl shadow">
+    <p className="text-xs text-slate-400 font-bold uppercase">{label}</p>
+    <p className="text-xl font-black">{value}</p>
+  </div>
+);
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
