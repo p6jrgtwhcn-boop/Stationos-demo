@@ -1,236 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>StationOS Demo</title>
-
-<style>
-:root {
-  --blue:#0b4fff;
-  --light:#f4f7fb;
-  --dark:#1e1e2f;
-  --card:#ffffff;
-  --green:#2ecc71;
-  --yellow:#f1c40f;
-  --red:#e74c3c;
-}
-
-* { box-sizing:border-box; font-family: Arial, sans-serif; }
-body { margin:0; background:var(--light); color:var(--dark); }
-
-header {
-  background:var(--blue);
-  color:#fff;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button {
-  padding:10px 14px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.primary { background:var(--blue); color:#fff; }
-.secondary { background:#ddd; }
-.locked { background:#aaa; cursor:not-allowed; }
-
-.container { padding:16px; }
-
-.card {
-  background:var(--card);
-  padding:16px;
-  border-radius:10px;
-  margin-bottom:14px;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
-}
-
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:12px;
-}
-
-.badge {
-  padding:4px 8px;
-  border-radius:12px;
-  font-size:12px;
-  color:#fff;
-}
-.green{background:var(--green);}
-.yellow{background:var(--yellow);}
-.red{background:var(--red);}
-.gray{background:#777;}
-
-#menu {
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,.5);
-  display:none;
-}
-
-#menuContent {
-  background:#fff;
-  width:260px;
-  height:100%;
-  padding:16px;
-}
-
-.menuItem {
-  padding:12px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
-}
-
-.hidden { display:none; }
-.center { text-align:center; }
-</style>
+  <meta charset="UTF-8" />
+  <title>StationOS — Official Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; }
+  </style>
 </head>
 
-<body>
+<body class="bg-slate-50 text-slate-900">
 
-<!-- LOGIN -->
-<div id="login" class="container center">
-  <h2>StationOS</h2>
-  <p>Select role to continue</p>
-  <button class="primary" onclick="login('staff')">Staff</button><br><br>
-  <button class="primary" onclick="login('manager')">Manager</button><br><br>
-  <button class="primary" onclick="login('hq')">HQ / OMC</button><br><br>
-  <button class="primary" onclick="login('audit')">Government (Audit)</button>
-</div>
-
-<!-- HEADER -->
-<header id="topBar" class="hidden">
-  <span id="title">StationOS</span>
-  <button onclick="toggleMenu()">☰</button>
-</header>
-
-<!-- MENU -->
-<div id="menu">
-  <div id="menuContent">
-    <h3>Menu</h3>
-    <div class="menuItem" onclick="showView('fuel')">Fuel POS</div>
-    <div class="menuItem" onclick="showView('retail')">Retail POS</div>
-    <div class="menuItem" onclick="showView('manager')">Manager Dashboard</div>
-    <div class="menuItem" onclick="showView('hq')">HQ Dashboard</div>
-    <div class="menuItem" onclick="showView('audit')">Audit View</div>
-    <div class="menuItem" onclick="logout()">Logout</div>
-  </div>
-</div>
-
-<!-- CONTENT -->
-<div id="app" class="container hidden">
-
-  <!-- STAFF POS -->
-  <div id="fuel" class="view">
-    <div class="card">
-      <h3>Fuel POS</h3>
-      <p>Sales Today: <strong>GHS 120,500</strong></p>
-      <button class="primary">Submit Fuel Shift</button>
-    </div>
-  </div>
-
-  <div id="retail" class="view hidden">
-    <div class="card">
-      <h3>Retail POS</h3>
-      <p>Sales Today: <strong>GHS 48,200</strong></p>
-      <button class="primary">Submit Retail Shift</button>
-    </div>
-  </div>
-
-  <!-- MANAGER -->
-  <div id="manager" class="view hidden">
-    <div class="card">
-      <h3>Manager’s View (GHS)</h3>
-      <div class="grid">
-        <div class="card">Fuel: GHS 120,500</div>
-        <div class="card">Retail: GHS 48,200</div>
-        <div class="card">Variance: <span class="badge yellow">- GHS 1,300</span></div>
-        <div class="card">Staff Status: <span class="badge green">Reported</span></div>
-      </div>
-      <br>
-      <button id="lockBtn" class="primary" onclick="lockDay()">Approve & Lock Day</button>
-      <p id="lockStatus"></p>
-    </div>
-  </div>
-
-  <!-- HQ -->
-  <div id="hq" class="view hidden">
-    <div class="card">
-      <h3>HQ / OMC Dashboard</h3>
-      <div class="card">
-        <strong>Accra Central</strong><br>
-        Revenue: GHS 168,700<br>
-        Variance: <span class="badge yellow">-1,300</span><br>
-        Status: <span class="badge green">Locked</span>
-      </div>
-      <div class="card">
-        <strong>Kumasi Main</strong><br>
-        Revenue: GHS 142,900<br>
-        Variance: <span class="badge green">OK</span><br>
-        Status: <span class="badge yellow">Pending</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- AUDIT -->
-  <div id="audit" class="view hidden">
-    <div class="card">
-      <h3>Government Audit View</h3>
-      <span class="badge gray">READ-ONLY</span>
-      <p>Station: Accra Central</p>
-      <p>Date: Today</p>
-      <p>Fuel Sales: GHS 120,500</p>
-      <p>Retail Sales: GHS 48,200</p>
-      <p>Variance: - GHS 1,300</p>
-      <p>Approved By: Manager</p>
-      <p>Status: 🔒 Locked</p>
-      <button class="secondary">Export PDF</button>
-      <button class="secondary">Export Excel</button>
-    </div>
-  </div>
-
-</div>
+<div id="app"></div>
 
 <script>
-let role = "";
-let locked = false;
+/* ---------------- APP STATE ---------------- */
+let view = "role"; // role, staffRole, fuelPOS, retailPOS, manager, hq, audit
+const app = document.getElementById("app");
 
-function login(r){
-  role=r;
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("topBar").classList.remove("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  showView(r==="staff"?"fuel":r);
+function setView(v){ view=v; render(); }
+
+/* ---------------- UI HELPERS ---------------- */
+function topBar(title, subtitle){
+  return `
+  <div class="bg-white border-b p-4 flex justify-between items-center">
+    <div>
+      <h1 class="font-black text-xl text-blue-700">StationOS</h1>
+      <p class="text-xs text-slate-500">${subtitle}</p>
+    </div>
+    <button onclick="toggleMenu()" class="font-black">☰</button>
+  </div>`;
 }
 
-function logout(){
-  location.reload();
+function stat(label,value,color){
+  return `
+  <div class="bg-white p-5 rounded-xl shadow">
+    <p class="text-xs text-slate-400 font-bold">${label}</p>
+    <p class="text-2xl font-black text-${color}-600">${value}</p>
+  </div>`;
+}
+
+function menu(items){
+  return `
+  <div id="menu" class="hidden fixed inset-0 bg-black/40 z-50" onclick="toggleMenu()">
+    <div class="bg-white w-64 h-full p-6" onclick="event.stopPropagation()">
+      <h3 class="font-black mb-4">Menu</h3>
+      ${items.map(i=>`<button onclick="${i.action}" class="block w-full text-left p-3 rounded hover:bg-slate-100">${i.label}</button>`).join("")}
+    </div>
+  </div>`;
 }
 
 function toggleMenu(){
-  document.getElementById("menu").style.display =
-    document.getElementById("menu").style.display==="block"?"none":"block";
+  document.getElementById("menu").classList.toggle("hidden");
 }
 
-function showView(id){
-  document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));
-  if(document.getElementById(id)) document.getElementById(id).classList.remove("hidden");
-  document.getElementById("menu").style.display="none";
+/* ---------------- SCREENS ---------------- */
+
+function roleScreen(){
+  return `
+  <div class="min-h-screen flex flex-col justify-center items-center gap-4 p-6">
+    <h1 class="text-3xl font-black text-blue-700">StationOS</h1>
+    <p class="text-slate-500 mb-6">Select access role</p>
+
+    <button onclick="setView('manager')" class="btn">Manager</button>
+    <button onclick="setView('staffRole')" class="btn">Staff</button>
+    <button onclick="setView('hq')" class="btn">HQ / OMC</button>
+    <button onclick="setView('audit')" class="btn">Government / Audit</button>
+  </div>`;
 }
 
-function lockDay(){
-  locked=true;
-  document.getElementById("lockBtn").classList.add("locked");
-  document.getElementById("lockBtn").disabled=true;
-  document.getElementById("lockStatus").innerText="🔒 Day locked by Manager at 21:03";
+function staffRole(){
+  return `
+  <div class="min-h-screen flex flex-col justify-center items-center gap-4 p-6">
+    <h2 class="text-2xl font-black">Staff Role</h2>
+    <button onclick="setView('fuelPOS')" class="btn">Fuel Staff</button>
+    <button onclick="setView('retailPOS')" class="btn">Retail Staff</button>
+    <button onclick="setView('role')" class="text-blue-600 mt-4">← Back</button>
+  </div>`;
 }
+
+function fuelPOS(){
+  return `
+  ${topBar("Fuel POS","Staff • Fuel Operations")}
+  ${menu([
+    {label:"Fuel POS",action:"toggleMenu()"},
+    {label:"Logout",action:"setView('role')"}
+  ])}
+  <div class="p-6 grid gap-4">
+    ${stat("Petrol Stock","12,400 L","blue")}
+    ${stat("Diesel Stock","8,100 L","blue")}
+    ${stat("Sales Today","GHS 34,500","green")}
+  </div>`;
+}
+
+function retailPOS(){
+  return `
+  ${topBar("Retail POS","Staff • Shop Operations")}
+  ${menu([
+    {label:"Retail POS",action:"toggleMenu()"},
+    {label:"Logout",action:"setView('role')"}
+  ])}
+  <div class="p-6 grid gap-4">
+    ${stat("Milk","IN STOCK","green")}
+    ${stat("Soft Drinks","LOW","blue")}
+    ${stat("Bread","CRITICAL","red")}
+  </div>`;
+}
+
+function manager(){
+  return `
+  ${topBar("Manager Dashboard","Station View • GHS")}
+  ${menu([
+    {label:"Dashboard",action:"toggleMenu()"},
+    {label:"Logout",action:"setView('role')"}
+  ])}
+  <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    ${stat("Fuel Sales","GHS 125,000","blue")}
+    ${stat("Retail Sales","GHS 48,000","blue")}
+    ${stat("Variance","-3,200","red")}
+  </div>`;
+}
+
+function hq(){
+  return `
+  ${topBar("HQ Dashboard","Multi-Station Overview")}
+  ${menu([
+    {label:"HQ Dashboard",action:"toggleMenu()"},
+    {label:"Logout",action:"setView('role')"}
+  ])}
+  <div class="p-6 grid gap-4">
+    ${stat("Stations","24","blue")}
+    ${stat("Daily Revenue","GHS 2.1M","green")}
+    ${stat("Alerts","3","red")}
+  </div>`;
+}
+
+function audit(){
+  return `
+  ${topBar("Government Audit","READ-ONLY • GHS")}
+  ${menu([
+    {label:"Audit Dashboard",action:"toggleMenu()"},
+    {label:"Logout",action:"setView('role')"}
+  ])}
+  <div class="p-6 grid gap-4">
+    ${stat("Stations Reported","24","blue")}
+    ${stat("Pending Reports","2","red")}
+    ${stat("Critical Variances","1","red")}
+  </div>`;
+}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  app.innerHTML = ({
+    role: roleScreen,
+    staffRole,
+    fuelPOS,
+    retailPOS,
+    manager,
+    hq,
+    audit
+  })[view]();
+}
+render();
 </script>
+
+<style>
+.btn{
+  width:100%;
+  max-width:300px;
+  background:#2563eb;
+  color:white;
+  padding:14px;
+  border-radius:12px;
+  font-weight:800;
+}
+</style>
 
 </body>
 </html>
