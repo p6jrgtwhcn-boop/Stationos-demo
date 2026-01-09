@@ -24,17 +24,6 @@
 <script type="text/babel">
 const { useState } = React;
 
-const demoData = {
-  stations: [
-    { id: 1, name: "Accra Central Station" },
-    { id: 2, name: "Tema Highway Station" }
-  ],
-  fuelSales: 125000,
-  retailSales: 48000,
-  creditExposure: 19000,
-  variance: -3200
-};
-
 function App() {
   const [role, setRole] = useState("login");
   const [view, setView] = useState("dashboard");
@@ -46,10 +35,24 @@ function App() {
           <h1 className="text-2xl font-black text-blue-700 mb-6">
             StationOS™
           </h1>
-          <button onClick={()=>setRole("staff")} className="btn">Staff Login</button>
-          <button onClick={()=>setRole("manager")} className="btn mt-3">Manager Login</button>
-          <button onClick={()=>setRole("hq")} className="btn mt-3">HQ / OMC</button>
-          <button onClick={()=>setRole("audit")} className="btn mt-3">Government Audit</button>
+          
+          <div className="space-y-3">
+            <button onClick={() => setRole("staff")} className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              Staff Login
+            </button>
+            <hr className="my-4 border-gray-300" />
+            <button onClick={() => setRole("manager")} className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              Manager Login
+            </button>
+            <hr className="my-4 border-gray-300" />
+            <button onClick={() => setRole("hq")} className="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+              HQ / OMC
+            </button>
+            <hr className="my-4 border-gray-300" />
+            <button onClick={() => setRole("audit")} className="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700">
+              Government Audit
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -60,13 +63,13 @@ function App() {
       <aside className="w-64 bg-white border-r p-6">
         <h2 className="text-xl font-black text-blue-700 mb-6">StationOS™</h2>
         <nav className="space-y-2">
-          <Nav label="Dashboard" onClick={()=>setView("dashboard")} />
-          {role !== "audit" && <Nav label="Fuel POS" onClick={()=>setView("fuel")} />}
-          {role !== "audit" && <Nav label="Retail POS" onClick={()=>setView("retail")} />}
-          <Nav label="Analytics" onClick={()=>setView("analytics")} />
-          {role === "audit" && <Nav label="Audit View" onClick={()=>setView("audit")} />}
+          <Nav label="Dashboard" onClick={() => setView("dashboard")} />
+          {role !== "audit" && <Nav label="Fuel POS" onClick={() => setView("fuel")} />}
+          {role !== "audit" && <Nav label="Retail POS" onClick={() => setView("retail")} />}
+          <Nav label="Analytics" onClick={() => setView("analytics")} />
+          {role === "audit" && <Nav label="Audit View" onClick={() => setView("audit")} />}
         </nav>
-        <button className="mt-10 text-red-500 font-bold" onClick={()=>setRole("login")}>
+        <button className="mt-10 text-red-500 font-bold" onClick={() => setRole("login")}>
           Exit
         </button>
       </aside>
@@ -139,6 +142,17 @@ const Card = ({title, value, danger}) => (
     <p className="text-2xl font-black mt-2">{value}</p>
   </div>
 );
+
+const demoData = {
+  stations: [
+    { id: 1, name: "Accra Central Station" },
+    { id: 2, name: "Tema Highway Station" }
+  ],
+  fuelSales: 125000,
+  retailSales: 48000,
+  creditExposure: 19000,
+  variance: -3200
+};
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
