@@ -2,159 +2,128 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>StationOS™ Official Demo</title>
+  <title>StationOS – Manager Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- React + ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont; }
-  </style>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-gray-100">
   <div id="root"></div>
 
-<script type="text/babel">
-const { useState } = React;
+  <script type="text/babel">
+    function App() {
+      const [menuOpen, setMenuOpen] = React.useState(false);
 
-function App() {
-  const [role, setRole] = useState("login");
-  const [view, setView] = useState("dashboard");
+      return (
+        <div className="min-h-screen bg-gray-100">
 
-  if (role === "login") {
-    return (
-      <div className="h-screen flex items-center justify-center bg-blue-900">
-        <div className="bg-white p-10 rounded-2xl w-80 text-center">
-          <h1 className="text-2xl font-black text-blue-700 mb-6">
-            StationOS™
-          </h1>
-          
-          <div className="space-y-3">
-            <button onClick={() => setRole("staff")} className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Staff Login
-            </button>
-            <hr className="my-4 border-gray-300" />
-            <button onClick={() => setRole("manager")} className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-              Manager Login
-            </button>
-            <hr className="my-4 border-gray-300" />
-            <button onClick={() => setRole("hq")} className="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-              HQ / OMC
-            </button>
-            <hr className="my-4 border-gray-300" />
-            <button onClick={() => setRole("audit")} className="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700">
-              Government Audit
-            </button>
+          {/* TOP BAR */}
+          <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-3 shadow">
+            <button onClick={() => setMenuOpen(true)} className="text-2xl font-bold">☰</button>
+            <div className="text-center">
+              <div className="font-semibold">Station Overview</div>
+              <div className="text-xs opacity-90">Manager’s View</div>
+            </div>
+            <div className="w-6"></div>
+          </div>
+
+          {/* POPUP MENU */}
+          {menuOpen && (
+            <div className="fixed inset-0 z-50 flex">
+              <div className="bg-white w-64 h-full shadow-lg p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="font-bold text-blue-600">StationOS</div>
+                  <button onClick={() => setMenuOpen(false)}>✕</button>
+                </div>
+
+                <nav className="space-y-3">
+                  <div className="font-semibold text-blue-600">Dashboard</div>
+                  <div className="text-gray-500">Fuel POS</div>
+                  <div className="text-gray-500">Retail POS</div>
+                  <div className="text-gray-500">Analytics</div>
+                  <div className="text-red-600 mt-4">Exit</div>
+                </nav>
+              </div>
+
+              <div
+                className="flex-1 bg-black bg-opacity-30"
+                onClick={() => setMenuOpen(false)}
+              ></div>
+            </div>
+          )}
+
+          {/* MAIN DASHBOARD */}
+          <div className="p-4 space-y-4">
+
+            {/* KEY METRICS */}
+            <div className="grid grid-cols-2 gap-4">
+              <MetricCard title="Total Revenue (Today)" value="GHS 173,000" />
+              <MetricCard title="Fuel Sales" value="GHS 125,000" />
+              <MetricCard title="Retail Sales" value="GHS 48,000" />
+              <MetricCard title="Variance / Alerts" value="- GHS 3,200" alert />
+            </div>
+
+            {/* OPERATIONAL INSIGHTS */}
+            <div className="grid grid-cols-1 gap-4">
+
+              {/* Cash vs Credit */}
+              <div className="bg-white p-4 rounded shadow">
+                <div className="font-semibold mb-2">Cash vs Credit</div>
+                <div className="flex justify-between text-sm">
+                  <span>Cash</span>
+                  <span className="font-medium">GHS 138,000</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Credit</span>
+                  <span className="font-medium">GHS 35,000</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-2">
+                  Fuel & retail combined
+                </div>
+              </div>
+
+              {/* Staff Reporting Status */}
+              <div className="bg-white p-4 rounded shadow">
+                <div className="font-semibold mb-2 flex items-center gap-2">
+                  🔒 Staff Reporting Status
+                </div>
+                <ul className="text-sm space-y-1">
+                  <li>⛽ Fuel Staff: <span className="text-green-600">Reported</span></li>
+                  <li>🛒 Retail Staff: <span className="text-yellow-600">Pending</span></li>
+                </ul>
+              </div>
+
+            </div>
+
+            {/* FOOTER NOTE */}
+            <div className="text-center text-xs text-gray-500 mt-4">
+              End-of-day reconciliation pending
+            </div>
+
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <div className="flex h-screen">
-      <aside className="w-64 bg-white border-r p-6">
-        <h2 className="text-xl font-black text-blue-700 mb-6">StationOS™</h2>
-        <nav className="space-y-2">
-          <Nav label="Dashboard" onClick={() => setView("dashboard")} />
-          {role !== "audit" && <Nav label="Fuel POS" onClick={() => setView("fuel")} />}
-          {role !== "audit" && <Nav label="Retail POS" onClick={() => setView("retail")} />}
-          <Nav label="Analytics" onClick={() => setView("analytics")} />
-          {role === "audit" && <Nav label="Audit View" onClick={() => setView("audit")} />}
-        </nav>
-        <button className="mt-10 text-red-500 font-bold" onClick={() => setRole("login")}>
-          Exit
-        </button>
-      </aside>
+    function MetricCard({ title, value, alert }) {
+      return (
+        <div className={`bg-white p-4 rounded shadow ${alert ? "border-l-4 border-red-500" : ""}`}>
+          <div className="text-xs text-gray-500">{title}</div>
+          <div className={`text-xl font-bold ${alert ? "text-red-600" : "text-blue-600"}`}>
+            {value}
+          </div>
+        </div>
+      );
+    }
 
-      <main className="flex-1 p-10 overflow-y-auto">
-        {view === "dashboard" && <Dashboard />}
-        {view === "fuel" && <FuelPOS />}
-        {view === "retail" && <RetailPOS />}
-        {view === "analytics" && <Analytics />}
-        {view === "audit" && <Audit />}
-      </main>
-    </div>
-  );
-}
-
-const Nav = ({label, onClick}) => (
-  <button onClick={onClick} className="block w-full text-left p-3 rounded-xl hover:bg-blue-50 font-bold">
-    {label}
-  </button>
-);
-
-const Dashboard = () => (
-  <>
-    <h1 className="text-3xl font-black mb-6">Executive Overview</h1>
-    <div className="grid grid-cols-4 gap-6">
-      <Card title="Fuel Revenue" value={`GHS ${demoData.fuelSales}`} />
-      <Card title="Retail Revenue" value={`GHS ${demoData.retailSales}`} />
-      <Card title="Credit Exposure" value={`GHS ${demoData.creditExposure}`} />
-      <Card title="Variance" value={`GHS ${demoData.variance}`} danger />
-    </div>
-  </>
-);
-
-const FuelPOS = () => (
-  <>
-    <h1 className="text-2xl font-black mb-6">Fuel POS</h1>
-    <p className="text-slate-500">Demo fuel sale recording interface.</p>
-  </>
-);
-
-const RetailPOS = () => (
-  <>
-    <h1 className="text-2xl font-black mb-6">Retail POS</h1>
-    <p className="text-slate-500">Demo supermarket / shop sales.</p>
-  </>
-);
-
-const Analytics = () => (
-  <>
-    <h1 className="text-2xl font-black mb-6">Analytics & Trends</h1>
-    <p className="text-slate-500">Revenue trends, station comparison, cash vs credit.</p>
-  </>
-);
-
-const Audit = () => (
-  <>
-    <h1 className="text-2xl font-black mb-6 text-red-600">Government Audit View</h1>
-    <ul className="space-y-3">
-      <li>Total Fuel Sales: GHS {demoData.fuelSales}</li>
-      <li>Total Retail Sales: GHS {demoData.retailSales}</li>
-      <li>Declared Variance: GHS {demoData.variance}</li>
-      <li>Status: ⚠️ Review Required</li>
-    </ul>
-  </>
-);
-
-const Card = ({title, value, danger}) => (
-  <div className={`p-6 rounded-2xl ${danger ? "bg-red-100" : "bg-white"} shadow`}>
-    <p className="text-xs uppercase font-bold text-slate-500">{title}</p>
-    <p className="text-2xl font-black mt-2">{value}</p>
-  </div>
-);
-
-const demoData = {
-  stations: [
-    { id: 1, name: "Accra Central Station" },
-    { id: 2, name: "Tema Highway Station" }
-  ],
-  fuelSales: 125000,
-  retailSales: 48000,
-  creditExposure: 19000,
-  variance: -3200
-};
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-</script>
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
 </body>
 </html>
