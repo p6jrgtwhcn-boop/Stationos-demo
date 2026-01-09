@@ -1,129 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>StationOS – Manager Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StationOS Demo</title>
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --blue:#0b4fff;
+  --light:#f4f7fb;
+  --dark:#1e1e2f;
+  --card:#ffffff;
+  --green:#2ecc71;
+  --yellow:#f1c40f;
+  --red:#e74c3c;
+}
 
-  <!-- React + ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+* { box-sizing:border-box; font-family: Arial, sans-serif; }
+body { margin:0; background:var(--light); color:var(--dark); }
+
+header {
+  background:var(--blue);
+  color:#fff;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button {
+  padding:10px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.primary { background:var(--blue); color:#fff; }
+.secondary { background:#ddd; }
+.locked { background:#aaa; cursor:not-allowed; }
+
+.container { padding:16px; }
+
+.card {
+  background:var(--card);
+  padding:16px;
+  border-radius:10px;
+  margin-bottom:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+
+.badge {
+  padding:4px 8px;
+  border-radius:12px;
+  font-size:12px;
+  color:#fff;
+}
+.green{background:var(--green);}
+.yellow{background:var(--yellow);}
+.red{background:var(--red);}
+.gray{background:#777;}
+
+#menu {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,.5);
+  display:none;
+}
+
+#menuContent {
+  background:#fff;
+  width:260px;
+  height:100%;
+  padding:16px;
+}
+
+.menuItem {
+  padding:12px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+
+.hidden { display:none; }
+.center { text-align:center; }
+</style>
 </head>
 
-<body class="bg-gray-100">
-  <div id="root"></div>
+<body>
 
-  <script type="text/babel">
-    function App() {
-      const [menuOpen, setMenuOpen] = React.useState(false);
+<!-- LOGIN -->
+<div id="login" class="container center">
+  <h2>StationOS</h2>
+  <p>Select role to continue</p>
+  <button class="primary" onclick="login('staff')">Staff</button><br><br>
+  <button class="primary" onclick="login('manager')">Manager</button><br><br>
+  <button class="primary" onclick="login('hq')">HQ / OMC</button><br><br>
+  <button class="primary" onclick="login('audit')">Government (Audit)</button>
+</div>
 
-      return (
-        <div className="min-h-screen bg-gray-100">
+<!-- HEADER -->
+<header id="topBar" class="hidden">
+  <span id="title">StationOS</span>
+  <button onclick="toggleMenu()">☰</button>
+</header>
 
-          {/* TOP BAR */}
-          <div className="flex items-center justify-between bg-blue-600 text-white px-4 py-3 shadow">
-            <button onClick={() => setMenuOpen(true)} className="text-2xl font-bold">☰</button>
-            <div className="text-center">
-              <div className="font-semibold">Station Overview</div>
-              <div className="text-xs opacity-90">Manager’s View</div>
-            </div>
-            <div className="w-6"></div>
-          </div>
+<!-- MENU -->
+<div id="menu">
+  <div id="menuContent">
+    <h3>Menu</h3>
+    <div class="menuItem" onclick="showView('fuel')">Fuel POS</div>
+    <div class="menuItem" onclick="showView('retail')">Retail POS</div>
+    <div class="menuItem" onclick="showView('manager')">Manager Dashboard</div>
+    <div class="menuItem" onclick="showView('hq')">HQ Dashboard</div>
+    <div class="menuItem" onclick="showView('audit')">Audit View</div>
+    <div class="menuItem" onclick="logout()">Logout</div>
+  </div>
+</div>
 
-          {/* POPUP MENU */}
-          {menuOpen && (
-            <div className="fixed inset-0 z-50 flex">
-              <div className="bg-white w-64 h-full shadow-lg p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="font-bold text-blue-600">StationOS</div>
-                  <button onClick={() => setMenuOpen(false)}>✕</button>
-                </div>
+<!-- CONTENT -->
+<div id="app" class="container hidden">
 
-                <nav className="space-y-3">
-                  <div className="font-semibold text-blue-600">Dashboard</div>
-                  <div className="text-gray-500">Fuel POS</div>
-                  <div className="text-gray-500">Retail POS</div>
-                  <div className="text-gray-500">Analytics</div>
-                  <div className="text-red-600 mt-4">Exit</div>
-                </nav>
-              </div>
+  <!-- STAFF POS -->
+  <div id="fuel" class="view">
+    <div class="card">
+      <h3>Fuel POS</h3>
+      <p>Sales Today: <strong>GHS 120,500</strong></p>
+      <button class="primary">Submit Fuel Shift</button>
+    </div>
+  </div>
 
-              <div
-                className="flex-1 bg-black bg-opacity-30"
-                onClick={() => setMenuOpen(false)}
-              ></div>
-            </div>
-          )}
+  <div id="retail" class="view hidden">
+    <div class="card">
+      <h3>Retail POS</h3>
+      <p>Sales Today: <strong>GHS 48,200</strong></p>
+      <button class="primary">Submit Retail Shift</button>
+    </div>
+  </div>
 
-          {/* MAIN DASHBOARD */}
-          <div className="p-4 space-y-4">
+  <!-- MANAGER -->
+  <div id="manager" class="view hidden">
+    <div class="card">
+      <h3>Manager’s View (GHS)</h3>
+      <div class="grid">
+        <div class="card">Fuel: GHS 120,500</div>
+        <div class="card">Retail: GHS 48,200</div>
+        <div class="card">Variance: <span class="badge yellow">- GHS 1,300</span></div>
+        <div class="card">Staff Status: <span class="badge green">Reported</span></div>
+      </div>
+      <br>
+      <button id="lockBtn" class="primary" onclick="lockDay()">Approve & Lock Day</button>
+      <p id="lockStatus"></p>
+    </div>
+  </div>
 
-            {/* KEY METRICS */}
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard title="Total Revenue (Today)" value="GHS 173,000" />
-              <MetricCard title="Fuel Sales" value="GHS 125,000" />
-              <MetricCard title="Retail Sales" value="GHS 48,000" />
-              <MetricCard title="Variance / Alerts" value="- GHS 3,200" alert />
-            </div>
+  <!-- HQ -->
+  <div id="hq" class="view hidden">
+    <div class="card">
+      <h3>HQ / OMC Dashboard</h3>
+      <div class="card">
+        <strong>Accra Central</strong><br>
+        Revenue: GHS 168,700<br>
+        Variance: <span class="badge yellow">-1,300</span><br>
+        Status: <span class="badge green">Locked</span>
+      </div>
+      <div class="card">
+        <strong>Kumasi Main</strong><br>
+        Revenue: GHS 142,900<br>
+        Variance: <span class="badge green">OK</span><br>
+        Status: <span class="badge yellow">Pending</span>
+      </div>
+    </div>
+  </div>
 
-            {/* OPERATIONAL INSIGHTS */}
-            <div className="grid grid-cols-1 gap-4">
+  <!-- AUDIT -->
+  <div id="audit" class="view hidden">
+    <div class="card">
+      <h3>Government Audit View</h3>
+      <span class="badge gray">READ-ONLY</span>
+      <p>Station: Accra Central</p>
+      <p>Date: Today</p>
+      <p>Fuel Sales: GHS 120,500</p>
+      <p>Retail Sales: GHS 48,200</p>
+      <p>Variance: - GHS 1,300</p>
+      <p>Approved By: Manager</p>
+      <p>Status: 🔒 Locked</p>
+      <button class="secondary">Export PDF</button>
+      <button class="secondary">Export Excel</button>
+    </div>
+  </div>
 
-              {/* Cash vs Credit */}
-              <div className="bg-white p-4 rounded shadow">
-                <div className="font-semibold mb-2">Cash vs Credit</div>
-                <div className="flex justify-between text-sm">
-                  <span>Cash</span>
-                  <span className="font-medium">GHS 138,000</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Credit</span>
-                  <span className="font-medium">GHS 35,000</span>
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  Fuel & retail combined
-                </div>
-              </div>
+</div>
 
-              {/* Staff Reporting Status */}
-              <div className="bg-white p-4 rounded shadow">
-                <div className="font-semibold mb-2 flex items-center gap-2">
-                  🔒 Staff Reporting Status
-                </div>
-                <ul className="text-sm space-y-1">
-                  <li>⛽ Fuel Staff: <span className="text-green-600">Reported</span></li>
-                  <li>🛒 Retail Staff: <span className="text-yellow-600">Pending</span></li>
-                </ul>
-              </div>
+<script>
+let role = "";
+let locked = false;
 
-            </div>
+function login(r){
+  role=r;
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("topBar").classList.remove("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  showView(r==="staff"?"fuel":r);
+}
 
-            {/* FOOTER NOTE */}
-            <div className="text-center text-xs text-gray-500 mt-4">
-              End-of-day reconciliation pending
-            </div>
+function logout(){
+  location.reload();
+}
 
-          </div>
-        </div>
-      );
-    }
+function toggleMenu(){
+  document.getElementById("menu").style.display =
+    document.getElementById("menu").style.display==="block"?"none":"block";
+}
 
-    function MetricCard({ title, value, alert }) {
-      return (
-        <div className={`bg-white p-4 rounded shadow ${alert ? "border-l-4 border-red-500" : ""}`}>
-          <div className="text-xs text-gray-500">{title}</div>
-          <div className={`text-xl font-bold ${alert ? "text-red-600" : "text-blue-600"}`}>
-            {value}
-          </div>
-        </div>
-      );
-    }
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));
+  if(document.getElementById(id)) document.getElementById(id).classList.remove("hidden");
+  document.getElementById("menu").style.display="none";
+}
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-  </script>
+function lockDay(){
+  locked=true;
+  document.getElementById("lockBtn").classList.add("locked");
+  document.getElementById("lockBtn").disabled=true;
+  document.getElementById("lockStatus").innerText="🔒 Day locked by Manager at 21:03";
+}
+</script>
+
 </body>
 </html>
